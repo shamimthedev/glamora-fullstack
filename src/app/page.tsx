@@ -1,4 +1,5 @@
-import { Header } from "@/components/layout/Header"
+import { Header } from "@/components/layout/header"
+import { ProductGrid } from "@/components/ecommerce/product-grid"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Sparkle, CheckCircle, Leaf, Recycle } from "lucide-react"
 
@@ -63,8 +64,30 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Quick Color Test Section */}
+        {/* Featured Products Section */}
         <section className="py-16 bg-white dark:bg-dark-bg">
+          <div className="container">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Featured <span className="text-primary-400">Products</span>
+              </h2>
+              <p className="text-lg text-gray-600 dark:text-dark-text-secondary max-w-2xl mx-auto">
+                Discover our best-selling clean beauty products loved by thousands
+              </p>
+            </div>
+            
+            <ProductGrid />
+            
+            <div className="text-center mt-12">
+              <Button size="lg" variant="outline" className="rounded-full px-8">
+                View All Products
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* Color Palette Section */}
+        <section className="py-16 bg-gray-50 dark:bg-dark-card">
           <div className="container">
             <h2 className="text-3xl font-bold text-center mb-12">Our Color Palette</h2>
             
