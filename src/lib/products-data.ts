@@ -213,3 +213,70 @@ export function getRelatedProducts(currentProductId: string, limit: number = 3):
     .filter(product => product.id !== currentProductId && product.category === currentProduct.category)
     .slice(0, limit)
 }
+
+export function filterProducts(products: Product[], filters: {
+  searchQuery: string
+  selectedCategories: string[]
+  priceRange: [number, number]
+  inStockOnly: boolean
+  onSaleOnly: boolean
+  sortBy: string
+}): Product[] {
+  let filtered = products.filter(product => {
+    // Search query filter
+    const matchesSearch = !filters.searchQuery || 
+      product.name.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
+      product.description.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
+      product.category.toLowerCase().includes(filters.searchQuery.toLowerCase())
+
+    // Category filter
+    const matchesCategory = filters.selectedCategories.length === 0 || 
+      filters.selectedCategories.includes(product.category)
+
+    // Price range filter
+    const productPrice = product.originalPrice || product.price
+    const matchesPrice = productPrice >= filters.priceRange[0] && 
+                        productPrice <= filters.priceRange[1]
+
+    // Stock filter
+    const matchesStock = !filters.inStockOnly || product.inStock
+
+    // Sale filter
+    const matchesSale = !filters.onSaleOnly || product.originalPrice !== undefined
+
+    return matchesSearch && matchesCategory && matchesPrice && matchesStock && matchesSale
+  })
+
+  // Sort products
+  filtered = sortProducts(filtered, filters.sortBy)
+
+  return filtered
+}
+
+export function sortProducts(products: Product[], sortBy: string): Product[] {
+  const sorted = [...products]
+  
+  switch (sortBy) {
+    case 'price-low':
+      return sorted.sort((a, b) => (a.originalPrice || a.price) - (b.originalPrice || b.price))
+    case 'price-high':
+      return sorted.sort((a, b) => (b.originalPrice || b.price) - (a.originalPrice || a.price))
+    case 'name':
+      return sorted.sort((a, b) => a.name.localeCompare(b.name))
+    case 'rating':
+      return sorted.sort((a, b) => b.rating - a.rating)
+    case 'newest':
+      return sorted.sort((a, b) => {
+        if (a.isNew && !b.isNew) return -1
+        if (!a.isNew && b.isNew) return 1
+        return 0
+      })
+    case 'featured':
+    default:
+      return sorted.sort((a, b) => {
+        if (a.isBestSeller && !b.isBestSeller) return -1
+        if (!a.isBestSeller && b.isBestSeller) return 1
+        return b.rating - a.rating
+      })
+  }
+}
