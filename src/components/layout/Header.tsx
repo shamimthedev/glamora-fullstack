@@ -20,26 +20,26 @@ export function Header() {
 
         {/* Desktop Navigation - Hidden on mobile */}
         <nav className="hidden md:flex items-center gap-8">
-          <Link 
-            href="/products" 
+          <Link
+            href="/products"
             className="text-sm font-medium transition-colors hover:text-primary-400"
           >
             Shop All
           </Link>
-          <Link 
-            href="/story" 
+          <Link
+            href="/story"
             className="text-sm font-medium transition-colors hover:text-primary-400"
           >
             Our Story
           </Link>
-          <Link 
-            href="/ingredients" 
+          <Link
+            href="/ingredients"
             className="text-sm font-medium transition-colors hover:text-primary-400"
           >
             Ingredients
           </Link>
-          <Link 
-            href="/blog" 
+          <Link
+            href="/blog"
             className="text-sm font-medium transition-colors hover:text-primary-400"
           >
             Blog
@@ -51,16 +51,16 @@ export function Header() {
           <Button variant="ghost" size="icon" className="rounded-full">
             <Search className="h-4 w-4" />
           </Button>
-          
+
           {/* Replace the old cart button with our new CartSidebar */}
           <CartSidebar />
-          
+
           <Button variant="ghost" size="icon" className="rounded-full">
             <User className="h-4 w-4" />
           </Button>
-          
+
           <ThemeToggle />
-          
+
           {/* Mobile Menu Button - Visible only on mobile */}
           <Button variant="ghost" size="icon" className="md:hidden rounded-full">
             <Menu className="h-4 w-4" />
