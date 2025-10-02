@@ -20,7 +20,7 @@ export default function ProductPage({ params }: ProductPageProps) {
     notFound()
   }
 
-  const relatedProducts = getRelatedProducts(params.id)
+  const relatedProducts = getRelatedProducts(params.id) || []
 
   return (
     <div className="min-h-screen">
