@@ -69,6 +69,27 @@ const mockProducts = [
     reviewCount: 95,
     isNew: true,
     shortDescription: "pH-balanced cleanser that removes impurities without stripping moisture."
+  },
+  {
+    id: "7",
+    name: "Matte Liquid Lipstick",
+    price: 26.99,
+    images: ["/placeholder-product.jpg"],
+    category: "Makeup",
+    rating: 4.5,
+    reviewCount: 167,
+    shortDescription: "Long-wearing matte lipstick in vibrant, transfer-proof colors."
+  },
+  {
+    id: "8",
+    name: "Hydrating Face Mist",
+    price: 18.99,
+    images: ["/placeholder-product.jpg"],
+    category: "Skincare",
+    rating: 4.2,
+    reviewCount: 78,
+    isNew: true,
+    shortDescription: "Refreshing facial mist with rosewater and hyaluronic acid."
   }
 ]
 
