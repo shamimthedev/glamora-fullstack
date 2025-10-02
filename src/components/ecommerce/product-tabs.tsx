@@ -1,20 +1,24 @@
 "use client"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ProductReviews } from "./product-reviews"
 
 interface ProductTabsProps {
   product: {
+    id: string
     description: string
     ingredients: string
     howToUse: string
     benefits: string[]
+    rating: number
+    reviewCount: number
   }
 }
 
 export function ProductTabs({ product }: ProductTabsProps) {
   return (
     <Tabs defaultValue="description" className="mb-16">
-      <TabsList className="grid w-full grid-cols-4 rounded-2xl p-1 bg-gray-50 dark:bg-dark-card">
+      <TabsList className="grid w-full grid-cols-5 rounded-2xl p-1 bg-gray-50 dark:bg-dark-card">
         <TabsTrigger 
           value="description" 
           className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-dark-border"
@@ -38,6 +42,12 @@ export function ProductTabs({ product }: ProductTabsProps) {
           className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-dark-border"
         >
           Benefits
+        </TabsTrigger>
+        <TabsTrigger 
+          value="reviews" 
+          className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-dark-border"
+        >
+          Reviews ({product.reviewCount})
         </TabsTrigger>
       </TabsList>
 
@@ -103,6 +113,14 @@ export function ProductTabs({ product }: ProductTabsProps) {
             ))}
           </ul>
         </div>
+      </TabsContent>
+
+      <TabsContent value="reviews" className="mt-8">
+        <ProductReviews 
+          productId={product.id}
+          averageRating={product.rating}
+          reviewCount={product.reviewCount}
+        />
       </TabsContent>
     </Tabs>
   )
