@@ -6,9 +6,7 @@ import { Heart, Eye, ShoppingCart, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useCartStore } from "@/lib/stores/cart-store"
-// import { toast } from "sonner"
-
-// We'll add toast notifications later, but let's prepare for it
+import { toast } from "sonner"
 
 interface Product {
   id: string
@@ -32,7 +30,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const { addItem, isInCart } = useCartStore()
 
   const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault() // Prevent navigation if this is inside a link
+    e.preventDefault()
     e.stopPropagation()
     
     addItem({
@@ -43,8 +41,34 @@ export function ProductCard({ product }: ProductCardProps) {
       category: product.category,
     })
     
-    // We'll add proper toast notifications later
-    console.log(`Added ${product.name} to cart!`)
+    toast.success("Added to cart!", {
+      description: `${product.name} has been added to your cart.`,
+      action: {
+        label: "View Cart",
+        onClick: () => {
+          // We could programmatically open the cart here
+          document.querySelector('[data-sheet-trigger]')?.dispatchEvent(new MouseEvent('click'))
+        },
+      },
+    })
+  }
+
+  const handleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    toast.info("Added to wishlist", {
+      description: `${product.name} has been saved to your wishlist.`,
+    })
+  }
+
+  const handleQuickView = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    toast.info("Quick view", {
+      description: `Quick view feature for ${product.name} coming soon!`,
+    })
   }
 
   const itemInCart = isInCart(product.id)
@@ -66,6 +90,7 @@ export function ProductCard({ product }: ProductCardProps) {
             variant="secondary" 
             size="icon" 
             className="h-9 w-9 rounded-full bg-white/90 dark:bg-dark-card/90 backdrop-blur-sm hover:bg-white"
+            onClick={handleWishlist}
           >
             <Heart className="h-4 w-4" />
           </Button>
@@ -73,6 +98,7 @@ export function ProductCard({ product }: ProductCardProps) {
             variant="secondary" 
             size="icon" 
             className="h-9 w-9 rounded-full bg-white/90 dark:bg-dark-card/90 backdrop-blur-sm hover:bg-white"
+            onClick={handleQuickView}
           >
             <Eye className="h-4 w-4" />
           </Button>
