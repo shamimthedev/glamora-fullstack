@@ -1,11 +1,14 @@
+"use client"
+
 import Image from "next/image"
 import Link from "next/link"
 import { Heart, Eye, ShoppingCart, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { useCartStore } from "@/lib/stores/cart-store"
+// import { toast } from "sonner"
 
-// We'll need to add the Badge component first
-// Run: npx shadcn-ui@latest add badge
+// We'll add toast notifications later, but let's prepare for it
 
 interface Product {
   id: string
@@ -26,6 +29,26 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const { addItem, isInCart } = useCartStore()
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault() // Prevent navigation if this is inside a link
+    e.stopPropagation()
+    
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.images[0],
+      category: product.category,
+    })
+    
+    // We'll add proper toast notifications later
+    console.log(`Added ${product.name} to cart!`)
+  }
+
+  const itemInCart = isInCart(product.id)
+
   return (
     <div className="group relative bg-white dark:bg-dark-card rounded-2xl border border-gray-100 dark:border-dark-border overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
       {/* Image Container */}
@@ -73,10 +96,15 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <Button 
             size="sm" 
-            className="w-full bg-primary-400 hover:bg-primary-500 text-white rounded-full shadow-lg"
+            className={`w-full rounded-full shadow-lg ${
+              itemInCart 
+                ? "bg-green-500 hover:bg-green-600 text-white" 
+                : "bg-primary-400 hover:bg-primary-500 text-white"
+            }`}
+            onClick={handleAddToCart}
           >
             <ShoppingCart className="h-4 w-4 mr-2" />
-            Add to Cart
+            {itemInCart ? "Added to Cart" : "Add to Cart"}
           </Button>
         </div>
       </div>
@@ -135,7 +163,12 @@ export function ProductCard({ product }: ProductCardProps) {
           {/* Mobile-only CTA */}
           <Button 
             size="sm" 
-            className="bg-primary-400 hover:bg-primary-500 text-white rounded-full px-4 md:hidden"
+            className={`rounded-full px-4 md:hidden ${
+              itemInCart 
+                ? "bg-green-500 hover:bg-green-600 text-white" 
+                : "bg-primary-400 hover:bg-primary-500 text-white"
+            }`}
+            onClick={handleAddToCart}
           >
             <ShoppingCart className="h-4 w-4" />
           </Button>
