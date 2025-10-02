@@ -1,11 +1,12 @@
 import { ProductCard } from "./product-card"
+import { Product } from "@/lib/products-data"
 
 interface RelatedProductsProps {
-  products: any[] // We can use the same type as our ProductCard
+  products?: Product[] // Make it optional
 }
 
-export function RelatedProducts({ products }: RelatedProductsProps) {
-  if (products.length === 0) return null
+export function RelatedProducts({ products = [] }: RelatedProductsProps) {
+  if (!products || products.length === 0) return null
 
   return (
     <section className="border-t border-gray-200 dark:border-dark-border pt-16">
