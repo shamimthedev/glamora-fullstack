@@ -1,6 +1,6 @@
 "use client"
 
-import { Filter, X } from "lucide-react"
+import { Filter } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { useFilterStore } from "@/lib/stores/filter-store"
