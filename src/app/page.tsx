@@ -76,7 +76,7 @@ export default function Home() {
               </p>
             </div>
             
-            <ProductGrid />
+            <ProductGrid limit={6} />
             
             <div className="text-center mt-12">
               <Button size="lg" variant="outline" className="rounded-full px-8">
