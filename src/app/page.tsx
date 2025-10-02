@@ -2,6 +2,7 @@ import { Header } from "@/components/layout/header"
 import { ProductGrid } from "@/components/ecommerce/product-grid"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Sparkle, CheckCircle, Leaf, Recycle } from "lucide-react"
+import { products } from "@/lib/products-data"
 
 export default function Home() {
   return (
@@ -76,7 +77,7 @@ export default function Home() {
               </p>
             </div>
             
-            <ProductGrid limit={6} />
+            <ProductGrid products={products.slice(0, 6)} />
             
             <div className="text-center mt-12">
               <Button size="lg" variant="outline" className="rounded-full px-8">
