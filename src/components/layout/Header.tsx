@@ -1,7 +1,8 @@
 import Link from "next/link"
-import { Sparkles, Menu, ShoppingCart, Search, User } from "lucide-react"
+import { Sparkles, Menu, Search, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
+import { CartSidebar } from "@/components/ecommerce/cart-sidebar"
 
 export function Header() {
   return (
@@ -51,9 +52,8 @@ export function Header() {
             <Search className="h-4 w-4" />
           </Button>
           
-          <Button variant="ghost" size="icon" className="rounded-full">
-            <ShoppingCart className="h-4 w-4" />
-          </Button>
+          {/* Replace the old cart button with our new CartSidebar */}
+          <CartSidebar />
           
           <Button variant="ghost" size="icon" className="rounded-full">
             <User className="h-4 w-4" />
