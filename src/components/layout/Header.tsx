@@ -1,12 +1,12 @@
+'use client'
 import Link from "next/link"
-import { Sparkles, Menu, Search, User, ShoppingCart } from "lucide-react"
+import { Sparkles, Menu, Search, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { CartSidebar } from "@/components/ecommerce/cart-sidebar"
 import { useCartStore } from "@/lib/stores/cart-store"
 
 export function Header() {
-  const { getTotalItems } = useCartStore()
   
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -57,17 +57,6 @@ export function Header() {
 
           {/* Replace the old cart button with our new CartSidebar */}
           <CartSidebar />
-
-          <Link href="/cart">
-            <Button variant="ghost" size="icon" className="relative rounded-full">
-              <ShoppingCart className="h-5 w-5" />
-              {getTotalItems() > 0 && (
-                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary-400 text-xs text-white flex items-center justify-center">
-                  {getTotalItems()}
-                </span>
-              )}
-            </Button>
-          </Link>
 
           <Button variant="ghost" size="icon" className="rounded-full">
             <User className="h-4 w-4" />
