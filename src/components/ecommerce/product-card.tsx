@@ -6,28 +6,20 @@ import { Heart, Eye, ShoppingCart, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useCartStore } from "@/lib/stores/cart-store"
+import { useWishlistStore } from "@/lib/stores/wishlist-store"
 import { toast } from "sonner"
-
-interface Product {
-  id: string
-  name: string
-  price: number
-  originalPrice?: number
-  images: string[]
-  category: string
-  rating: number
-  reviewCount: number
-  isNew?: boolean
-  isBestSeller?: boolean
-  shortDescription: string
-}
+import { Product } from "@/lib/products-data" // Import the full Product type
 
 interface ProductCardProps {
-  product: Product
+  product: Product // Use the full Product type
 }
 
 export function ProductCard({ product }: ProductCardProps) {
   const { addItem, isInCart } = useCartStore()
+  const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlistStore()
+
+  const itemInCart = isInCart(product.id)
+  const itemInWishlist = isInWishlist(product.id)
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -46,13 +38,21 @@ export function ProductCard({ product }: ProductCardProps) {
     })
   }
 
-  const handleWishlist = (e: React.MouseEvent) => {
+  const handleWishlistToggle = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
     
-    toast.info("Added to wishlist", {
-      description: `${product.name} has been saved to your wishlist.`,
-    })
+    if (itemInWishlist) {
+      removeFromWishlist(product.id)
+      toast.info("Removed from wishlist", {
+        description: `${product.name} has been removed from your wishlist.`,
+      })
+    } else {
+      addToWishlist(product) // Now this should work with the full Product type
+      toast.success("Added to wishlist!", {
+        description: `${product.name} has been saved to your wishlist.`,
+      })
+    }
   }
 
   const handleQuickView = (e: React.MouseEvent) => {
@@ -63,8 +63,6 @@ export function ProductCard({ product }: ProductCardProps) {
       description: `Quick view feature for ${product.name} coming soon!`,
     })
   }
-
-  const itemInCart = isInCart(product.id)
 
   return (
     <div className="group relative bg-white dark:bg-dark-card rounded-2xl border border-gray-100 dark:border-dark-border overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
@@ -99,10 +97,12 @@ export function ProductCard({ product }: ProductCardProps) {
         <Button 
           variant="secondary" 
           size="icon" 
-          className="h-9 w-9 rounded-full bg-white/90 dark:bg-dark-card/90 backdrop-blur-sm hover:bg-white"
-          onClick={handleWishlist}
+          className={`h-9 w-9 rounded-full bg-white/90 dark:bg-dark-card/90 backdrop-blur-sm hover:bg-white ${
+            itemInWishlist ? 'text-red-500' : 'text-gray-600'
+          }`}
+          onClick={handleWishlistToggle}
         >
-          <Heart className="h-4 w-4" />
+          <Heart className={`h-4 w-4 ${itemInWishlist ? 'fill-current' : ''}`} />
         </Button>
         <Button 
           variant="secondary" 

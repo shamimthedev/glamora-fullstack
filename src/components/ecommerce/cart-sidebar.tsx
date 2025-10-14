@@ -6,16 +6,17 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { useCartStore } from "@/lib/stores/cart-store"
 import Image from "next/image"
 import { useState } from "react"
+import Link from "next/link"
 
 export function CartSidebar() {
   const [open, setOpen] = useState(false)
-  const { 
-    items, 
-    removeItem, 
-    updateQuantity, 
-    getTotalPrice, 
+  const {
+    items,
+    removeItem,
+    updateQuantity,
+    getTotalPrice,
     getTotalItems,
-    clearCart 
+    clearCart
   } = useCartStore()
 
   return (
@@ -30,7 +31,7 @@ export function CartSidebar() {
           )}
         </Button>
       </SheetTrigger>
-      
+
       <SheetContent side="right" className="flex flex-col w-full sm:max-w-md">
         <SheetHeader className="border-b pb-4">
           <SheetTitle className="flex items-center gap-2">
@@ -38,7 +39,7 @@ export function CartSidebar() {
             Your Cart ({getTotalItems()})
           </SheetTitle>
         </SheetHeader>
-        
+
         <div className="flex-1 overflow-auto py-4">
           {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
@@ -47,7 +48,7 @@ export function CartSidebar() {
               <p className="text-gray-500 dark:text-dark-text-secondary mb-4">
                 Add some beautiful products to your cart
               </p>
-              <Button 
+              <Button
                 onClick={() => setOpen(false)}
                 className="bg-primary-400 hover:bg-primary-500"
               >
@@ -67,7 +68,7 @@ export function CartSidebar() {
                       className="object-cover"
                     />
                   </div>
-                  
+
                   {/* Product Details */}
                   <div className="flex-1 min-w-0">
                     <h4 className="font-medium text-sm line-clamp-2 mb-1">
@@ -76,7 +77,7 @@ export function CartSidebar() {
                     <p className="text-primary-400 font-semibold">
                       ${item.price}
                     </p>
-                    
+
                     {/* Quantity Controls */}
                     <div className="flex items-center gap-2 mt-2">
                       <Button
@@ -87,11 +88,11 @@ export function CartSidebar() {
                       >
                         <Minus className="h-3 w-3" />
                       </Button>
-                      
+
                       <span className="text-sm w-8 text-center font-medium">
                         {item.quantity}
                       </span>
-                      
+
                       <Button
                         variant="outline"
                         size="icon"
@@ -102,7 +103,7 @@ export function CartSidebar() {
                       </Button>
                     </div>
                   </div>
-                  
+
                   {/* Remove Button */}
                   <Button
                     variant="ghost"
@@ -117,7 +118,7 @@ export function CartSidebar() {
             </div>
           )}
         </div>
-        
+
         {/* Cart Summary */}
         {items.length > 0 && (
           <div className="border-t pt-4 space-y-4">
@@ -130,28 +131,26 @@ export function CartSidebar() {
                 Shipping & taxes calculated at checkout
               </p>
             </div>
-            
+
             <div className="space-y-2">
-              <Button 
-                className="w-full bg-primary-400 hover:bg-primary-500 text-white rounded-full"
-                onClick={() => {
-                  // We'll implement checkout later
-                  console.log("Proceed to checkout")
-                }}
-              >
-                Checkout
-              </Button>
-              
+              <Link href="/checkout">
+                <Button
+                  className="w-full bg-primary-400 hover:bg-primary-500 text-white rounded-full"
+                >
+                  Checkout
+                </Button>
+              </Link>
+
               <div className="flex gap-2">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="flex-1 rounded-full"
                   onClick={() => setOpen(false)}
                 >
                   Continue Shopping
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="flex-1 rounded-full text-red-500 hover:text-red-600 hover:bg-red-50"
                   onClick={clearCart}
                 >
