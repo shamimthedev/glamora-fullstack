@@ -3,23 +3,95 @@
 import { Header } from "@/components/layout/header"
 import { Button } from "@/components/ui/button"
 import { useCartStore } from "@/lib/stores/cart-store"
+import { useOrderStore } from "@/lib/stores/order-store"
 import { ArrowLeft, Lock } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
+import { useSession } from "next-auth/react"
+import { toast } from "sonner"
 
 export default function CheckoutPage() {
+  const { data: session } = useSession()
   const { items, getTotalPrice, getTotalItems, clearCart } = useCartStore()
+  const { createOrder } = useOrderStore()
   const [isProcessing, setIsProcessing] = useState(false)
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    address: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    paymentMethod: "credit-card"
+  })
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }))
+  }
 
   const handleCheckout = async () => {
+    if (!session?.user) {
+      toast.error("Please sign in to complete your order")
+      return
+    }
+
     setIsProcessing(true)
-    // Simulate payment processing
-    setTimeout(() => {
+
+    try {
+      // Simulate payment processing
+      await new Promise(resolve => setTimeout(resolve, 2000))
+
+      // Create order
+      const orderId = createOrder({
+        userId: session.user.id!,
+        items: items.map(item => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          image: item.image,
+          category: item.category,
+          quantity: item.quantity
+        })),
+        total: getTotalPrice() * 1.08, // Including tax
+        subtotal: getTotalPrice(),
+        shipping: 0, // Free shipping
+        tax: getTotalPrice() * 0.08,
+        status: 'confirmed',
+        shippingAddress: {
+          fullName: formData.fullName,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          zipCode: formData.zipCode,
+          country: "United States"
+        },
+        paymentMethod: formData.paymentMethod,
+        paymentStatus: 'paid',
+        estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
+        trackingNumber: `TRK${Date.now()}`,
+        carrier: "USPS"
+      })
+
+      // Clear cart
       clearCart()
+
+      toast.success("Order placed successfully!", {
+        description: `Your order #${orderId} has been confirmed.`,
+      })
+
+      // Redirect to order confirmation
+      window.location.href = `/orders/${orderId}`
+      
+    } catch (error) {
+      toast.error("Payment failed", {
+        description: "Please try again or use a different payment method.",
+      })
+    } finally {
       setIsProcessing(false)
-      // In a real app, we'd redirect to success page
-      alert("Order placed successfully! (This is a demo)")
-    }, 2000)
+    }
   }
 
   if (items.length === 0) {
@@ -80,38 +152,41 @@ export default function CheckoutPage() {
               
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">First Name</label>
+                  <label className="block text-sm font-medium mb-2">Full Name</label>
                   <input
                     type="text"
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-200 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
-                    placeholder="John"
+                    placeholder="John Doe"
+                    required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Last Name</label>
+                  <label className="block text-sm font-medium mb-2">Email</label>
                   <input
-                    type="text"
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-200 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
-                    placeholder="Doe"
+                    placeholder="john@example.com"
+                    required
                   />
                 </div>
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-2">Email</label>
-                <input
-                  type="email"
-                  className="w-full px-3 py-2 border border-gray-200 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
-                  placeholder="john@example.com"
-                />
               </div>
 
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-2">Address</label>
                 <input
                   type="text"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-200 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
                   placeholder="123 Main St"
+                  required
                 />
               </div>
 
@@ -120,24 +195,36 @@ export default function CheckoutPage() {
                   <label className="block text-sm font-medium mb-2">City</label>
                   <input
                     type="text"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-200 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
                     placeholder="New York"
+                    required
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">State</label>
                   <input
                     type="text"
+                    name="state"
+                    value={formData.state}
+                    onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-200 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
                     placeholder="NY"
+                    required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">ZIP</label>
+                  <label className="block text-sm font-medium mb-2">ZIP Code</label>
                   <input
                     type="text"
+                    name="zipCode"
+                    value={formData.zipCode}
+                    onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-200 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
                     placeholder="10001"
+                    required
                   />
                 </div>
               </div>
@@ -148,15 +235,36 @@ export default function CheckoutPage() {
               
               <div className="space-y-4">
                 <div className="flex items-center gap-3 p-4 border border-gray-200 dark:border-dark-border rounded-lg">
-                  <input type="radio" name="payment" defaultChecked className="text-primary-400" />
+                  <input 
+                    type="radio" 
+                    name="paymentMethod" 
+                    value="credit-card" 
+                    checked={formData.paymentMethod === 'credit-card'}
+                    onChange={handleInputChange}
+                    className="text-primary-400" 
+                  />
                   <span>Credit Card</span>
                 </div>
                 <div className="flex items-center gap-3 p-4 border border-gray-200 dark:border-dark-border rounded-lg">
-                  <input type="radio" name="payment" className="text-primary-400" />
+                  <input 
+                    type="radio" 
+                    name="paymentMethod" 
+                    value="paypal" 
+                    checked={formData.paymentMethod === 'paypal'}
+                    onChange={handleInputChange}
+                    className="text-primary-400" 
+                  />
                   <span>PayPal</span>
                 </div>
                 <div className="flex items-center gap-3 p-4 border border-gray-200 dark:border-dark-border rounded-lg">
-                  <input type="radio" name="payment" className="text-primary-400" />
+                  <input 
+                    type="radio" 
+                    name="paymentMethod" 
+                    value="apple-pay" 
+                    checked={formData.paymentMethod === 'apple-pay'}
+                    onChange={handleInputChange}
+                    className="text-primary-400" 
+                  />
                   <span>Apple Pay</span>
                 </div>
               </div>
@@ -205,7 +313,7 @@ export default function CheckoutPage() {
               <Button 
                 className="w-full bg-primary-400 hover:bg-primary-500 text-white rounded-full py-3 text-lg flex items-center justify-center gap-2"
                 onClick={handleCheckout}
-                disabled={isProcessing}
+                disabled={isProcessing || !formData.fullName || !formData.address}
               >
                 <Lock className="h-5 w-5" />
                 {isProcessing ? "Processing..." : `Pay $${(getTotalPrice() * 1.08).toFixed(2)}`}
