@@ -1,10 +1,10 @@
 'use client'
 import Link from "next/link"
-import { Sparkles, Menu, Search, User } from "lucide-react"
+import { Sparkles, Menu, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { CartSidebar } from "@/components/ecommerce/cart-sidebar"
-import { useCartStore } from "@/lib/stores/cart-store"
+import { UserDropdown } from "./user-dropdown"
 
 export function Header() {
   
@@ -58,9 +58,8 @@ export function Header() {
           {/* Replace the old cart button with our new CartSidebar */}
           <CartSidebar />
 
-          <Button variant="ghost" size="icon" className="rounded-full">
-            <User className="h-4 w-4" />
-          </Button>
+          {/* User Dropdown */}
+          <UserDropdown />
 
           <ThemeToggle />
 
