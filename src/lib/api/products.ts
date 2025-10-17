@@ -7,6 +7,20 @@ export interface ApiProduct extends Product {
   reviews: ProductReview[]
 }
 
+// Helper function to get the base URL
+function getBaseUrl(): string {
+  if (typeof window !== 'undefined') {
+    // Browser environment
+    return ''
+  }
+  if (process.env.VERCEL_URL) {
+    // Vercel environment
+    return `https://${process.env.VERCEL_URL}`
+  }
+  // Development environment
+  return `http://localhost:${process.env.PORT || 3000}`
+}
+
 // Helper function to transform Prisma product to our Product type
 function transformProduct(product: any): Product {
   return {
@@ -42,11 +56,11 @@ function transformProduct(product: any): Product {
         name: review.user.name,
         image: review.user.image,
       } : undefined,
-      createdAt: review.createdAt.toISOString(),
-      updatedAt: review.updatedAt.toISOString(),
+      createdAt: review.createdAt,
+      updatedAt: review.updatedAt,
     })) || [],
-    createdAt: product.createdAt.toISOString(),
-    updatedAt: product.updatedAt.toISOString(),
+    createdAt: product.createdAt,
+    updatedAt: product.updatedAt,
   }
 }
 
@@ -61,7 +75,12 @@ export async function getProducts(filters?: {
   if (filters?.search) params.append('search', filters.search)
   if (filters?.limit) params.append('limit', filters.limit.toString())
 
-  const response = await fetch(`/api/products?${params}`)
+  const baseUrl = getBaseUrl()
+  const url = `${baseUrl}/api/products?${params}`
+  
+  const response = await fetch(url, {
+    cache: 'no-store' // Ensure fresh data
+  })
   
   if (!response.ok) {
     throw new Error('Failed to fetch products')
@@ -72,7 +91,8 @@ export async function getProducts(filters?: {
 }
 
 export async function getProductById(id: string): Promise<Product> {
-  const response = await fetch(`/api/products/${id}`)
+  const baseUrl = getBaseUrl()
+  const response = await fetch(`${baseUrl}/api/products/${id}`)
   
   if (!response.ok) {
     if (response.status === 404) {
@@ -86,7 +106,8 @@ export async function getProductById(id: string): Promise<Product> {
 }
 
 export async function getRelatedProducts(productId: string, category: string, limit: number = 3): Promise<Product[]> {
-  const response = await fetch(`/api/products?category=${category}&limit=${limit + 1}`)
+  const baseUrl = getBaseUrl()
+  const response = await fetch(`${baseUrl}/api/products?category=${category}&limit=${limit + 1}`)
   
   if (!response.ok) {
     throw new Error('Failed to fetch related products')

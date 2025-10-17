@@ -1,13 +1,23 @@
 // src/app/page.tsx
 import { Header } from "@/components/layout/header"
+import { Footer } from "@/components/layout/footer"
 import { ProductGrid } from "@/components/ecommerce/product-grid"
 import { Button } from "@/components/ui/button"
 import { getProducts } from "@/lib/api/products"
 import { Sparkle, CheckCircle, Leaf, Recycle, ArrowRight } from "lucide-react"
 import Link from "next/link"
+import { Product } from "../../types/product"
 
 export default async function Home() {
-  const featuredProducts = await getProducts({ limit: 6 })
+  let featuredProducts: Product[] = []
+  
+  try {
+    featuredProducts = await getProducts({ limit: 6 })
+  } catch (error) {
+    console.error('Error fetching featured products:', error)
+    // Fallback to empty array if API fails
+    featuredProducts = []
+  }
 
   return (
     <div className="min-h-screen">
@@ -94,44 +104,9 @@ export default async function Home() {
             </div>
           </div>
         </section>
-
-        {/* Color Palette Section */}
-        <section className="py-16 bg-gray-50 dark:bg-dark-card">
-          <div className="container">
-            <h2 className="text-3xl font-bold text-center mb-12">Our Color Palette</h2>
-            
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 max-w-4xl mx-auto">
-              {/* Primary Color Card */}
-              <div className="text-center">
-                <div className="h-32 rounded-2xl bg-primary-400 mb-4 shadow-lg"></div>
-                <h3 className="font-semibold">Alta Red</h3>
-                <p className="text-sm text-gray-600 dark:text-dark-text-secondary">Primary Brand</p>
-              </div>
-              
-              {/* Accent Color Card */}
-              <div className="text-center">
-                <div className="h-32 rounded-2xl bg-accent-500 mb-4 shadow-lg"></div>
-                <h3 className="font-semibold">Elegant Purple</h3>
-                <p className="text-sm text-gray-600 dark:text-dark-text-secondary">Accent Color</p>
-              </div>
-              
-              {/* Success Color Card */}
-              <div className="text-center">
-                <div className="h-32 rounded-2xl bg-green-500 mb-4 shadow-lg"></div>
-                <h3 className="font-semibold">Fresh Green</h3>
-                <p className="text-sm text-gray-600 dark:text-dark-text-secondary">Success/Trust</p>
-              </div>
-              
-              {/* Dark Mode Card */}
-              <div className="text-center">
-                <div className="h-32 rounded-2xl bg-dark-card border border-dark-border mb-4 shadow-lg"></div>
-                <h3 className="font-semibold">Dark Elegance</h3>
-                <p className="text-sm text-gray-600 dark:text-dark-text-secondary">Dark Mode</p>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
+
+      <Footer />
     </div>
   )
 }
