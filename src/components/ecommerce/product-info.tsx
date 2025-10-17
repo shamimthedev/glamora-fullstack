@@ -6,27 +6,33 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useCartStore } from "@/lib/stores/cart-store"
 import { toast } from "sonner"
-import { Product } from "../../../types/product"
+import { Product, ProductVariant } from "../../../types/product"
 
 interface ProductInfoProps {
   product: Product
 }
 
 export function ProductInfo({ product }: ProductInfoProps) {
-    const [selectedVariant, setSelectedVariant] = useState(product.variants[0].id)
+    const [selectedVariant, setSelectedVariant] = useState<string>(
+        product.variants[0]?.id || product.id
+    )
     const [quantity, setQuantity] = useState(1)
     const { addItem, isInCart } = useCartStore()
 
-    const selectedVariantData = product.variants.find(v => v.id === selectedVariant)
-    const displayPrice = selectedVariantData?.price || product.price
-    const itemInCart = isInCart(product.id)
+    const selectedVariantData: ProductVariant | undefined = product.variants.find(
+        (v: ProductVariant) => v.id === selectedVariant
+    )
+    
+    // Use variant price if available and not null, otherwise use product price
+    const displayPrice: number = selectedVariantData?.price ?? product.price
+    const itemInCart: boolean = isInCart(product.id)
 
-    const handleAddToCart = () => {
+    const handleAddToCart = (): void => {
         addItem({
             id: product.id,
             name: product.name,
             price: displayPrice,
-            image: "/placeholder-product.jpg", // In real app, use variant image
+            image: product.images[0] || "/placeholder-product.jpg",
             category: product.category,
         })
 
@@ -35,12 +41,23 @@ export function ProductInfo({ product }: ProductInfoProps) {
         })
     }
 
-    const handleBuyNow = () => {
+    const handleBuyNow = (): void => {
         handleAddToCart()
-        // In a real app, we'd redirect to checkout
         toast.info("Proceed to checkout", {
             description: "Checkout functionality coming soon!",
         })
+    }
+
+    const getVariantDisplayPrice = (variant: ProductVariant): string => {
+        return variant.price ? `$${variant.price.toFixed(2)}` : ""
+    }
+
+    const shouldShowVariantPrice = (variant: ProductVariant): boolean => {
+        return variant.price != null && variant.price !== product.price
+    }
+
+    const isVariantInStock = (variant: ProductVariant): boolean => {
+        return variant.inStock
     }
 
     return (
@@ -73,10 +90,11 @@ export function ProductInfo({ product }: ProductInfoProps) {
                     {[1, 2, 3, 4, 5].map((star) => (
                         <Star
                             key={star}
-                            className={`h-5 w-5 ${star <= product.rating
+                            className={`h-5 w-5 ${
+                                star <= product.rating
                                     ? "text-yellow-400 fill-current"
                                     : "text-gray-300 dark:text-gray-600"
-                                }`}
+                            }`}
                         />
                     ))}
                 </div>
@@ -99,7 +117,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
                         ${product.originalPrice.toFixed(2)}
                     </span>
                 )}
-                {product.originalPrice && (
+                {product.originalPrice && product.originalPrice > displayPrice && (
                     <Badge className="bg-green-500 text-white border-0">
                         Save ${(product.originalPrice - displayPrice).toFixed(2)}
                     </Badge>
@@ -114,7 +132,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
                         <span className="text-sm text-green-600 dark:text-green-400 font-medium">
                             In Stock
                         </span>
-                        {product.variants.find(v => v.id === selectedVariant)?.name === "30ml" && (
+                        {selectedVariantData?.name === "30ml" && (
                             <span className="text-sm text-orange-600 dark:text-orange-400">
                                 • Low stock
                             </span>
@@ -136,65 +154,73 @@ export function ProductInfo({ product }: ProductInfoProps) {
             </p>
 
             {/* Variants */}
-            <div className="space-y-4">
-                <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-dark-text-primary mb-3">
-                        Size:
-                    </h3>
-                    <div className="flex flex-wrap gap-3">
-                        {product.variants.map((variant) => (
-                            <button
-                                key={variant.id}
-                                onClick={() => setSelectedVariant(variant.id)}
-                                disabled={!variant.inStock}
-                                className={`px-4 py-3 rounded-lg border-2 text-sm font-medium transition-all ${selectedVariant === variant.id
-                                        ? "border-primary-400 bg-primary-50 dark:bg-primary-400/10 text-primary-400"
-                                        : "border-gray-200 dark:border-dark-border hover:border-gray-300 text-gray-700 dark:text-dark-text-secondary"
-                                    } ${!variant.inStock
-                                        ? "opacity-50 cursor-not-allowed line-through"
-                                        : ""
+            {product.variants.length > 0 && (
+                <div className="space-y-4">
+                    <div>
+                        <h3 className="font-semibold text-gray-900 dark:text-dark-text-primary mb-3">
+                            Size:
+                        </h3>
+                        <div className="flex flex-wrap gap-3">
+                            {product.variants.map((variant: ProductVariant) => (
+                                <button
+                                    key={variant.id}
+                                    onClick={() => setSelectedVariant(variant.id)}
+                                    disabled={!isVariantInStock(variant)}
+                                    className={`px-4 py-3 rounded-lg border-2 text-sm font-medium transition-all ${
+                                        selectedVariant === variant.id
+                                            ? "border-primary-400 bg-primary-50 dark:bg-primary-400/10 text-primary-400"
+                                            : "border-gray-200 dark:border-dark-border hover:border-gray-300 text-gray-700 dark:text-dark-text-secondary"
+                                    } ${
+                                        !isVariantInStock(variant)
+                                            ? "opacity-50 cursor-not-allowed line-through"
+                                            : ""
                                     }`}
-                            >
-                                {variant.name}
-                                {variant.price !== product.price && (
-                                    <span className="block text-xs mt-1">
-                                        ${variant.price.toFixed(2)}
-                                    </span>
-                                )}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Quantity */}
-                <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-dark-text-primary mb-3">
-                        Quantity:
-                    </h3>
-                    <div className="flex items-center gap-3">
-                        <div className="flex items-center border border-gray-200 dark:border-dark-border rounded-lg">
-                            <button
-                                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                className="px-4 py-2 text-gray-500 hover:text-gray-700 dark:hover:text-dark-text-primary"
-                            >
-                                -
-                            </button>
-                            <span className="px-4 py-2 border-x border-gray-200 dark:border-dark-border font-medium">
-                                {quantity}
-                            </span>
-                            <button
-                                onClick={() => setQuantity(quantity + 1)}
-                                className="px-4 py-2 text-gray-500 hover:text-gray-700 dark:hover:text-dark-text-primary"
-                            >
-                                +
-                            </button>
+                                >
+                                    {variant.name}
+                                    {shouldShowVariantPrice(variant) && (
+                                        <span className="block text-xs mt-1">
+                                            {getVariantDisplayPrice(variant)}
+                                        </span>
+                                    )}
+                                </button>
+                            ))}
                         </div>
-                        <span className="text-sm text-gray-500 dark:text-dark-text-secondary">
-                            {selectedVariantData?.inStock ? "In stock" : "Out of stock"}
-                        </span>
+                    </div>
+
+                    {/* Quantity */}
+                    <div>
+                        <h3 className="font-semibold text-gray-900 dark:text-dark-text-primary mb-3">
+                            Quantity:
+                        </h3>
+                        <div className="flex items-center gap-3">
+                            <div className="flex items-center border border-gray-200 dark:border-dark-border rounded-lg">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                    className="h-8 w-8 p-0 hover:bg-transparent"
+                                >
+                                    -
+                                </Button>
+                                <span className="px-4 py-2 border-x border-gray-200 dark:border-dark-border font-medium min-w-12 text-center">
+                                    {quantity}
+                                </span>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setQuantity(quantity + 1)}
+                                    className="h-8 w-8 p-0 hover:bg-transparent"
+                                >
+                                    +
+                                </Button>
+                            </div>
+                            <span className="text-sm text-gray-500 dark:text-dark-text-secondary">
+                                {selectedVariantData?.inStock ? "In stock" : "Out of stock"}
+                            </span>
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 pt-4">
