@@ -8,22 +8,22 @@ import { Heart, ShoppingCart, Trash2, ArrowRight } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { toast } from "sonner"
-
-interface WishlistProduct {
-  id: string
-  name: string
-  price: number
-  originalPrice?: number
-  images: string[]
-  category: string
-  shortDescription: string
-}
+import { useEffect } from "react"
+import { useSession } from "next-auth/react"
 
 export default function WishlistPage() {
-  const { items, removeItem, clearWishlist, getTotalItems } = useWishlistStore()
+  const { data: session } = useSession()
+  const { items, removeItem, clearWishlist, getTotalItems, syncWithDatabase } = useWishlistStore()
   const { addItem } = useCartStore()
 
-  const handleAddToCart = (product: WishlistProduct) => {
+  // Sync wishlist with database when component mounts
+  useEffect(() => {
+    if (session?.user) {
+      syncWithDatabase()
+    }
+  }, [session?.user, syncWithDatabase])
+
+  const handleAddToCart = (product: any) => {
     addItem({
       id: product.id,
       name: product.name,
@@ -38,7 +38,7 @@ export default function WishlistPage() {
   }
 
   const handleMoveAllToCart = () => {
-    items.forEach((product: WishlistProduct) => {
+    items.forEach((product: any) => {
       addItem({
         id: product.id,
         name: product.name,
@@ -127,7 +127,7 @@ export default function WishlistPage() {
 
         {/* Wishlist Items */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
-          {items.map((product: WishlistProduct) => (
+          {items.map((product: any) => (
             <div key={product.id} className="group relative bg-white dark:bg-dark-card rounded-2xl border border-gray-100 dark:border-dark-border overflow-hidden transition-all duration-300 hover:shadow-lg">
               {/* Remove from Wishlist Button */}
               <Button
