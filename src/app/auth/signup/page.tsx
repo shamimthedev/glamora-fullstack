@@ -1,4 +1,3 @@
-// src/app/auth/signup/page.tsx
 "use client"
 
 import { useState } from "react"
@@ -84,7 +83,7 @@ export default function SignUpPage() {
                     description: result.message || "Please try again.",
                 })
             }
-        } catch (error) {
+        } catch {
             toast.error("Something went wrong", {
                 description: "Please try again later.",
             })
@@ -96,7 +95,7 @@ export default function SignUpPage() {
     const handleGoogleSignIn = async () => {
         try {
             await signIn('google', { callbackUrl: '/' })
-        } catch (error) {
+        } catch {
             toast.error("Google sign in failed", {
                 description: "Please try again.",
             })
@@ -115,7 +114,7 @@ export default function SignUpPage() {
                             <Sparkles className="h-8 w-8 text-primary-400" />
                             <span className="text-2xl font-bold">Glamora</span>
                         </div>
-                        <h1 className="text-3xl font-bold mb-2">Create Account</h1>
+                        <h1 className="text-3lin font-bold mb-2">Create Account</h1>
                         <p className="text-gray-600 dark:text-dark-text-secondary">
                             Join us to discover beautiful products
                         </p>

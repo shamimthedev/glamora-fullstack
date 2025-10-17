@@ -1,4 +1,5 @@
 'use client'
+
 import Link from "next/link"
 import { Sparkles, Menu, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -55,7 +56,7 @@ export function Header() {
             <Search className="h-4 w-4" />
           </Button>
 
-          {/* Replace the old cart button with our new CartSidebar */}
+          {/* Cart Sidebar */}
           <CartSidebar />
 
           {/* User Dropdown */}

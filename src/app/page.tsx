@@ -8,6 +8,9 @@ import { Sparkle, CheckCircle, Leaf, Recycle, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { Product } from "../../types/product"
 
+// Add this to make the page dynamic
+export const dynamic = 'force-dynamic'
+
 export default async function Home() {
   let featuredProducts: Product[] = []
   

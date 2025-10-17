@@ -157,7 +157,7 @@ export default function OrdersPage() {
                     
                     {/* Order Items Preview */}
                     <div className="flex gap-3 overflow-x-auto pb-2">
-                      {order.orderItems.slice(0, 4).map((item, index) => (
+                      {order.orderItems.slice(0, 4).map((item) => (
                         <div key={item.id} className="flex items-center gap-2 bg-gray-50 dark:bg-dark-border px-3 py-2 rounded-lg min-w-0 flex-shrink-0">
                           <Package className="h-4 w-4 text-gray-400 flex-shrink-0" />
                           <div className="min-w-0">

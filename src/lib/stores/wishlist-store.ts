@@ -1,3 +1,4 @@
+// lib/stores/wishlist-store.ts
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { Product } from '../../../types/product'
@@ -10,6 +11,10 @@ interface WishlistStore {
   isInWishlist: (productId: string) => boolean
   getTotalItems: () => number
   syncWithDatabase: () => Promise<void>
+}
+
+interface WishlistItemResponse {
+  product: Product
 }
 
 export const useWishlistStore = create<WishlistStore>()(
@@ -75,8 +80,8 @@ export const useWishlistStore = create<WishlistStore>()(
         try {
           const response = await fetch('/api/wishlist')
           if (response.ok) {
-            const wishlistItems = await response.json()
-            const products = wishlistItems.map((item: any) => item.product)
+            const wishlistItems: WishlistItemResponse[] = await response.json()
+            const products = wishlistItems.map((item: WishlistItemResponse) => item.product)
             set({ items: products })
           }
         } catch (error) {

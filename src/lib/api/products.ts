@@ -21,8 +21,62 @@ function getBaseUrl(): string {
   return `http://localhost:${process.env.PORT || 3000}`
 }
 
+// Interface for Prisma product response
+interface PrismaProduct {
+  id: string
+  name: string
+  description: string
+  shortDescription: string
+  price: number
+  originalPrice: number | null
+  images: string[]
+  category: string
+  rating: number
+  reviewCount: number
+  inStock: boolean
+  stockQuantity: number
+  sku: string
+  tags: string[]
+  isNew: boolean
+  isBestSeller: boolean
+  ingredients: string | null
+  howToUse: string | null
+  benefits: string[]
+  variants: PrismaVariant[]
+  reviews: PrismaReview[]
+  createdAt: string | Date
+  updatedAt: string | Date
+}
+
+interface PrismaVariant {
+  id: string
+  productId: string
+  name: string
+  price: number | null
+  inStock: boolean
+  sku: string | null
+  createdAt: string | Date
+  updatedAt: string | Date
+}
+
+interface PrismaReview {
+  id: string
+  userId: string
+  productId: string
+  rating: number
+  title: string | null
+  comment: string | null
+  verified: boolean
+  user: {
+    name: string | null
+    image: string | null
+  } | null
+  createdAt: string | Date
+  updatedAt: string | Date
+}
+
 // Helper function to transform Prisma product to our Product type
-function transformProduct(product: any): Product {
+function transformProduct(product: PrismaProduct): Product {
   return {
     id: product.id,
     name: product.name,
@@ -43,8 +97,17 @@ function transformProduct(product: any): Product {
     ingredients: product.ingredients,
     howToUse: product.howToUse,
     benefits: product.benefits,
-    variants: product.variants || [],
-    reviews: product.reviews?.map((review: any) => ({
+    variants: product.variants.map(variant => ({
+      id: variant.id,
+      productId: variant.productId,
+      name: variant.name,
+      price: variant.price,
+      inStock: variant.inStock,
+      sku: variant.sku,
+      createdAt: typeof variant.createdAt === 'string' ? variant.createdAt : variant.createdAt.toISOString(),
+      updatedAt: typeof variant.updatedAt === 'string' ? variant.updatedAt : variant.updatedAt.toISOString(),
+    })),
+    reviews: product.reviews.map(review => ({
       id: review.id,
       userId: review.userId,
       productId: review.productId,
@@ -56,11 +119,11 @@ function transformProduct(product: any): Product {
         name: review.user.name,
         image: review.user.image,
       } : undefined,
-      createdAt: review.createdAt,
-      updatedAt: review.updatedAt,
-    })) || [],
-    createdAt: product.createdAt,
-    updatedAt: product.updatedAt,
+      createdAt: typeof review.createdAt === 'string' ? review.createdAt : review.createdAt.toISOString(),
+      updatedAt: typeof review.updatedAt === 'string' ? review.updatedAt : review.updatedAt.toISOString(),
+    })),
+    createdAt: typeof product.createdAt === 'string' ? product.createdAt : product.createdAt.toISOString(),
+    updatedAt: typeof product.updatedAt === 'string' ? product.updatedAt : product.updatedAt.toISOString(),
   }
 }
 
@@ -79,14 +142,15 @@ export async function getProducts(filters?: {
   const url = `${baseUrl}/api/products?${params}`
   
   const response = await fetch(url, {
-    cache: 'no-store' // Ensure fresh data
+    // Remove cache: 'no-store' to allow static generation
+    next: { revalidate: 60 } // Revalidate every 60 seconds
   })
   
   if (!response.ok) {
     throw new Error('Failed to fetch products')
   }
 
-  const products = await response.json()
+  const products: PrismaProduct[] = await response.json()
   return products.map(transformProduct)
 }
 
@@ -101,7 +165,7 @@ export async function getProductById(id: string): Promise<Product> {
     throw new Error('Failed to fetch product')
   }
 
-  const product = await response.json()
+  const product: PrismaProduct = await response.json()
   return transformProduct(product)
 }
 
@@ -113,7 +177,7 @@ export async function getRelatedProducts(productId: string, category: string, li
     throw new Error('Failed to fetch related products')
   }
 
-  const products = await response.json()
+  const products: PrismaProduct[] = await response.json()
   const transformedProducts = products.map(transformProduct)
   // Filter out the current product
   return transformedProducts.filter((product: Product) => product.id !== productId).slice(0, limit)

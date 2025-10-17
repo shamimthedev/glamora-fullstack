@@ -2,6 +2,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { BarChart3, Package, Users, ShoppingCart, TrendingUp, TrendingDown } from "lucide-react"
 
+// Add this to make the page dynamic
+export const dynamic = 'force-dynamic'
+
 interface AdminStats {
   totalRevenue: number
   productCount: number
@@ -25,7 +28,7 @@ interface StatItem {
   value: string
   change: string
   trend: "up" | "down"
-  icon: React.ComponentType<any>
+  icon: React.ComponentType<{ className?: string }>
 }
 
 interface OrderItem {
@@ -44,7 +47,8 @@ interface ProductItem {
 async function getAdminStats(): Promise<AdminStats | null> {
   try {
     const response = await fetch(`${process.env.NEXTAUTH_URL}/api/admin/stats`, {
-      cache: 'no-store',
+      // Remove no-store to allow caching
+      next: { revalidate: 60 } // Revalidate every 60 seconds
     })
     
     if (!response.ok) {
@@ -61,7 +65,7 @@ async function getAdminStats(): Promise<AdminStats | null> {
 export default async function AdminDashboard() {
   const statsData = await getAdminStats()
 
-  // Fallback to mock data if API fails
+  // Rest of the component remains the same...
   const stats: StatItem[] = statsData ? [
     {
       title: "Total Revenue",

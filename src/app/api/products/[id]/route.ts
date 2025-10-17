@@ -3,14 +3,14 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
 interface Context {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export async function GET(request: Request, context: Context) {
   try {
-    const { id } = context.params
+    const { id } = await context.params
 
     const product = await prisma.product.findUnique({
       where: { id },

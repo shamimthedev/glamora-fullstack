@@ -6,7 +6,7 @@ import { ProductGrid } from "@/components/ecommerce/product-grid"
 import { SearchBox } from "@/components/ecommerce/search-box"
 import { FilterSidebar } from "@/components/ecommerce/filter-sidebar"
 import { Button } from "@/components/ui/button"
-import { Filter, Grid3X3, List } from "lucide-react"
+import { Grid3X3, List } from "lucide-react"
 import { useFilterStore } from "@/lib/stores/filter-store"
 import { getProducts } from "@/lib/api/products"
 import { useState, useEffect } from "react"
@@ -150,7 +150,7 @@ export default function ProductsPage() {
               <div className="text-6xl mb-4">🔍</div>
               <h3 className="text-xl font-semibold mb-2">No products found</h3>
               <p className="text-gray-600 dark:text-dark-text-secondary mb-4">
-                Try adjusting your search or filters to find what you're looking for.
+                Try adjusting your search or filters to find what you&apos;re looking for.
               </p>
               <Button 
                 variant="outline" 

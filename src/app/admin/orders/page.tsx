@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ShoppingCart, Search, Eye, Truck, CheckCircle, Clock, XCircle } from "lucide-react"
-import { useOrderStore } from "@/lib/stores/order-store"
 
 // This would normally come from your database
 const mockOrders = [

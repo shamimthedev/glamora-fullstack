@@ -1,6 +1,33 @@
+// src/app/api/orders/route.ts
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+
+interface OrderItemData {
+  id: string
+  name: string
+  price: number
+  image: string
+  category: string
+  quantity: number
+}
+
+interface CreateOrderData {
+  items: OrderItemData[]
+  total: number
+  subtotal: number
+  shipping: number
+  tax: number
+  shippingAddress: {
+    fullName: string
+    address: string
+    city: string
+    state: string
+    zipCode: string
+    country: string
+  }
+  paymentMethod: string
+}
 
 export async function GET() {
   try {
@@ -40,7 +67,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const body = await request.json()
+    const body: CreateOrderData = await request.json()
     const { items, total, subtotal, shipping, tax, shippingAddress, paymentMethod } = body
 
     // Generate order number
@@ -65,7 +92,7 @@ export async function POST(request: Request) {
         shippingZipCode: shippingAddress.zipCode,
         shippingCountry: shippingAddress.country,
         orderItems: {
-          create: items.map((item: any) => ({
+          create: items.map((item: OrderItemData) => ({
             productId: item.id,
             productName: item.name,
             productImage: item.image,

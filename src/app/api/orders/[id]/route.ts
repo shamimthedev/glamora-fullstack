@@ -3,9 +3,9 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
 interface Context {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export async function GET(request: Request, context: Context) {
@@ -16,7 +16,7 @@ export async function GET(request: Request, context: Context) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id } = context.params
+    const { id } = await context.params
 
     const order = await prisma.order.findUnique({
       where: {

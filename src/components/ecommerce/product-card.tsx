@@ -9,17 +9,24 @@ import { useCartStore } from "@/lib/stores/cart-store"
 import { useWishlistStore } from "@/lib/stores/wishlist-store"
 import { toast } from "sonner"
 import { Product } from "../../../types/product"
+import { useEffect, useState } from "react"
 
 interface ProductCardProps {
   product: Product
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const [mounted, setMounted] = useState(false)
   const { addItem, isInCart } = useCartStore()
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlistStore()
 
-  const itemInCart = isInCart(product.id)
-  const itemInWishlist = isInWishlist(product.id)
+  // Fix hydration by only checking cart state after component mounts
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const itemInCart = mounted ? isInCart(product.id) : false
+  const itemInWishlist = mounted ? isInWishlist(product.id) : false
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -48,7 +55,7 @@ export function ProductCard({ product }: ProductCardProps) {
         description: `${product.name} has been removed from your wishlist.`,
       })
     } else {
-      addToWishlist(product) // Now this should work with the full Product type
+      addToWishlist(product)
       toast.success("Added to wishlist!", {
         description: `${product.name} has been saved to your wishlist.`,
       })

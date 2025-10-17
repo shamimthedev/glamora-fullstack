@@ -9,7 +9,14 @@ export async function GET(request: Request) {
     const search = searchParams.get('search')
     const limit = searchParams.get('limit')
 
-    let where: any = {}
+    const where: {
+      category?: string
+      OR?: Array<{
+        name?: { contains: string; mode: 'insensitive' }
+        description?: { contains: string; mode: 'insensitive' }
+        shortDescription?: { contains: string; mode: 'insensitive' }
+      }>
+    } = {}
 
     // Filter by category
     if (category && category !== 'all') {

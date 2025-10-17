@@ -1,18 +1,15 @@
 "use client"
 
 import { Header } from "@/components/layout/header"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { useCartStore } from "@/lib/stores/cart-store"
 import { CheckoutForm } from "@/components/ecommerce/checkout-form"
 import { Package, CreditCard, Truck } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { redirect } from "next/navigation"
-import Link from "next/link"
 
 export default function CheckoutPage() {
   const { data: session } = useSession()
-  const { items, getTotalPrice, clearCart } = useCartStore()
+  const { items, getTotalPrice } = useCartStore()
 
   if (!session?.user) {
     redirect('/auth/signin')

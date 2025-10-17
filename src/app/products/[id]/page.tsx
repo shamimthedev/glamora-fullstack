@@ -6,6 +6,7 @@ import { ProductTabs } from "@/components/ecommerce/product-tabs"
 import { RelatedProducts } from "@/components/ecommerce/related-products"
 import { getProductById, getRelatedProducts } from "@/lib/api/products"
 import { notFound } from "next/navigation"
+import Link from "next/link"
 
 interface ProductPageProps {
   params: {
@@ -20,7 +21,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   try {
     product = await getProductById(params.id)
     relatedProducts = await getRelatedProducts(product.id, product.category, 3)
-  } catch (error) {
+  } catch {
     notFound()
   }
 
@@ -32,13 +33,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
         <div className="container">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-sm text-gray-500 dark:text-dark-text-secondary mb-8">
-            <a href="/" className="hover:text-primary-400">Home</a>
+            <Link href="/" className="hover:text-primary-400">Home</Link>
             <span>›</span>
-            <a href="/products" className="hover:text-primary-400">Products</a>
+            <Link href="/products" className="hover:text-primary-400">Products</Link>
             <span>›</span>
-            <a href={`/products?category=${product.category.toLowerCase()}`} className="hover:text-primary-400">
+            <Link href={`/products?category=${product.category.toLowerCase()}`} className="hover:text-primary-400">
               {product.category}
-            </a>
+            </Link>
             <span>›</span>
             <span className="text-gray-900 dark:text-dark-text-primary">{product.name}</span>
           </nav>

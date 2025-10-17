@@ -47,7 +47,7 @@ const mockReviews: Review[] = [
   }
 ]
 
-export function ProductReviews({ productId, averageRating, reviewCount }: ProductReviewsProps) {
+export function ProductReviews({ averageRating, reviewCount }: ProductReviewsProps) {
   const ratingDistribution = [
     { stars: 5, count: 84, percentage: 65 },
     { stars: 4, count: 32, percentage: 25 },

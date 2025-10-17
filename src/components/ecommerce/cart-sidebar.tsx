@@ -5,11 +5,12 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { useCartStore } from "@/lib/stores/cart-store"
 import Image from "next/image"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 
 export function CartSidebar() {
   const [open, setOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const {
     items,
     removeItem,
@@ -19,14 +20,21 @@ export function CartSidebar() {
     clearCart
   } = useCartStore()
 
+  // Fix hydration by only showing cart count after component mounts
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const totalItems = mounted ? getTotalItems() : 0
+
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className="relative rounded-full">
           <ShoppingCart className="h-5 w-5" />
-          {getTotalItems() > 0 && (
+          {mounted && totalItems > 0 && (
             <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary-400 text-xs text-white flex items-center justify-center">
-              {getTotalItems()}
+              {totalItems}
             </span>
           )}
         </Button>
@@ -36,7 +44,7 @@ export function CartSidebar() {
         <SheetHeader className="border-b pb-4">
           <SheetTitle className="flex items-center gap-2">
             <ShoppingCart className="h-5 w-5" />
-            Your Cart ({getTotalItems()})
+            Your Cart ({mounted ? getTotalItems() : 0})
           </SheetTitle>
         </SheetHeader>
 
@@ -125,7 +133,7 @@ export function CartSidebar() {
             <div className="space-y-2">
               <div className="flex justify-between text-lg font-semibold">
                 <span>Subtotal</span>
-                <span>${getTotalPrice().toFixed(2)}</span>
+                <span>${mounted ? getTotalPrice().toFixed(2) : '0.00'}</span>
               </div>
               <p className="text-sm text-gray-500 dark:text-dark-text-secondary">
                 Shipping & taxes calculated at checkout

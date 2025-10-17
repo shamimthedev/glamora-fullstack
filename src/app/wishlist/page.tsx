@@ -10,6 +10,7 @@ import Link from "next/link"
 import { toast } from "sonner"
 import { useEffect } from "react"
 import { useSession } from "next-auth/react"
+import { Product } from "../../../types/product"
 
 export default function WishlistPage() {
   const { data: session } = useSession()
@@ -23,7 +24,7 @@ export default function WishlistPage() {
     }
   }, [session?.user, syncWithDatabase])
 
-  const handleAddToCart = (product: any) => {
+  const handleAddToCart = (product: Product) => {
     addItem({
       id: product.id,
       name: product.name,
@@ -38,7 +39,7 @@ export default function WishlistPage() {
   }
 
   const handleMoveAllToCart = () => {
-    items.forEach((product: any) => {
+    items.forEach((product: Product) => {
       addItem({
         id: product.id,
         name: product.name,
@@ -127,7 +128,7 @@ export default function WishlistPage() {
 
         {/* Wishlist Items */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
-          {items.map((product: any) => (
+          {items.map((product: Product) => (
             <div key={product.id} className="group relative bg-white dark:bg-dark-card rounded-2xl border border-gray-100 dark:border-dark-border overflow-hidden transition-all duration-300 hover:shadow-lg">
               {/* Remove from Wishlist Button */}
               <Button

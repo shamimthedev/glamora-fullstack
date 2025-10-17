@@ -8,13 +8,13 @@ import Image from "next/image"
 import Link from "next/link"
 
 export default function CartPage() {
-  const { 
-    items, 
-    removeItem, 
-    updateQuantity, 
-    getTotalPrice, 
+  const {
+    items,
+    removeItem,
+    updateQuantity,
+    getTotalPrice,
     getTotalItems,
-    clearCart 
+    clearCart
   } = useCartStore()
 
   if (items.length === 0) {
@@ -26,7 +26,7 @@ export default function CartPage() {
             <ShoppingBag className="h-24 w-24 text-gray-300 mx-auto mb-6" />
             <h1 className="text-3xl font-bold mb-4">Your cart is empty</h1>
             <p className="text-gray-600 dark:text-dark-text-secondary mb-8">
-              Looks like you haven't added any products to your cart yet.
+              Looks like you haven&apos;t added any products to your cart yet.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/products">
@@ -49,7 +49,7 @@ export default function CartPage() {
   return (
     <div className="min-h-screen">
       <Header />
-      
+
       <main className="container py-8">
         {/* Page Header */}
         <div className="text-center mb-12">
@@ -68,8 +68,8 @@ export default function CartPage() {
               <h2 className="text-2xl font-semibold">
                 Your Items ({getTotalItems()})
               </h2>
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 onClick={clearCart}
                 className="text-red-500 hover:text-red-600 hover:bg-red-50"
               >
@@ -89,7 +89,7 @@ export default function CartPage() {
                       className="object-cover"
                     />
                   </div>
-                  
+
                   {/* Product Details */}
                   <div className="flex-1 min-w-0">
                     <Link href={`/products/${item.id}`}>
@@ -100,7 +100,7 @@ export default function CartPage() {
                     <p className="text-gray-600 dark:text-dark-text-secondary text-sm mb-3">
                       {item.category}
                     </p>
-                    
+
                     {/* Quantity Controls */}
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-2">
@@ -112,11 +112,11 @@ export default function CartPage() {
                         >
                           <Minus className="h-3 w-3" />
                         </Button>
-                        
+
                         <span className="w-8 text-center font-medium">
                           {item.quantity}
                         </span>
-                        
+
                         <Button
                           variant="outline"
                           size="icon"
@@ -126,13 +126,13 @@ export default function CartPage() {
                           <Plus className="h-3 w-3" />
                         </Button>
                       </div>
-                      
+
                       <span className="text-lg font-bold text-primary-400">
                         ${(item.price * item.quantity).toFixed(2)}
                       </span>
                     </div>
                   </div>
-                  
+
                   {/* Remove Button */}
                   <Button
                     variant="ghost"
@@ -160,7 +160,7 @@ export default function CartPage() {
           <div className="lg:col-span-1">
             <div className="sticky top-8 bg-white dark:bg-dark-card rounded-2xl border border-gray-100 dark:border-dark-border p-6 space-y-6">
               <h2 className="text-2xl font-semibold">Order Summary</h2>
-              
+
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span>Subtotal ({getTotalItems()} items)</span>
@@ -198,15 +198,13 @@ export default function CartPage() {
               </div>
 
               {/* Checkout Button */}
-              <Button 
-                className="w-full bg-primary-400 hover:bg-primary-500 text-white rounded-full py-3 text-lg"
-                onClick={() => {
-                  // We'll implement checkout later
-                  console.log("Proceed to checkout")
-                }}
-              >
-                Proceed to Checkout
-              </Button>
+              <Link href="/checkout">
+                <Button
+                  className="w-full bg-primary-400 hover:bg-primary-500 text-white rounded-full py-3 text-lg"
+                >
+                  Proceed to Checkout
+                </Button>
+              </Link>
 
               {/* Trust Badges */}
               <div className="grid grid-cols-3 gap-4 pt-4 border-t text-center text-xs">

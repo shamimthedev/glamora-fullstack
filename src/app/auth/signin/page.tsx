@@ -1,4 +1,3 @@
-// src/app/auth/signin/page.tsx
 "use client"
 
 import { useState } from "react"
@@ -40,7 +39,7 @@ export default function SignInPage() {
         router.push('/')
         router.refresh()
       }
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong", {
         description: "Please try again later.",
       })
@@ -52,7 +51,7 @@ export default function SignInPage() {
   const handleGoogleSignIn = async () => {
     try {
       await signIn('google', { callbackUrl: '/' })
-    } catch (error) {
+    } catch {
       toast.error("Google sign in failed", {
         description: "Please try again.",
       })

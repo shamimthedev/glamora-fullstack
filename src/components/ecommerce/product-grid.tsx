@@ -1,6 +1,7 @@
 import { Product } from "../../../types/product"
 import { Button } from "../ui/button"
 import { ProductCard } from "./product-card"
+import Image from "next/image"
 
 interface ProductGridProps {
   products: Product[]
@@ -24,10 +25,12 @@ export function ProductGrid({ products = [], viewMode = 'grid' }: ProductGridPro
           <div key={product.id} className="flex gap-6 p-6 bg-white dark:bg-dark-card rounded-2xl border border-gray-100 dark:border-dark-border">
             {/* Product image */}
             <div className="flex-shrink-0 w-32 h-32 relative rounded-lg overflow-hidden bg-gray-50">
-              <img
+              <Image
                 src={product.images[0] || "/placeholder-product.jpg"}
                 alt={product.name}
-                className="object-cover w-full h-full"
+                fill
+                className="object-cover"
+                sizes="128px"
               />
             </div>
             
