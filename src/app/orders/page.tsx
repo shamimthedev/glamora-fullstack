@@ -1,23 +1,59 @@
-// src/app/orders/page.tsx
 "use client"
 
 import { Header } from "@/components/layout/header"
 import { Button } from "@/components/ui/button"
-import { useOrderStore } from "@/lib/stores/order-store"
 import { Package, Clock, CheckCircle, Truck, XCircle } from "lucide-react"
 import Link from "next/link"
 import { useSession } from "next-auth/react"
 import { redirect } from "next/navigation"
+import { useEffect, useState } from "react"
+
+interface Order {
+  id: string
+  orderNumber: string
+  status: string
+  paymentStatus: string
+  total: number
+  createdAt: string
+  estimatedDelivery?: string
+  trackingNumber?: string
+  carrier?: string
+  orderItems: Array<{
+    id: string
+    productName: string
+    productImage: string
+    quantity: number
+    productPrice: number
+  }>
+  shippingFullName: string
+}
 
 export default function OrdersPage() {
   const { data: session } = useSession()
-  const { getUserOrders } = useOrderStore()
+  const [orders, setOrders] = useState<Order[]>([])
+  const [loading, setLoading] = useState(true)
 
   if (!session?.user) {
     redirect('/auth/signin')
   }
 
-  const orders = getUserOrders(session.user.id!)
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await fetch('/api/orders')
+        if (response.ok) {
+          const data = await response.json()
+          setOrders(data)
+        }
+      } catch (error) {
+        console.error('Error fetching orders:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchOrders()
+  }, [])
 
   const getStatusConfig = (status: string) => {
     const config = {
@@ -27,8 +63,24 @@ export default function OrdersPage() {
       shipped: { color: "text-orange-600 bg-orange-50", icon: Truck },
       delivered: { color: "text-green-600 bg-green-50", icon: CheckCircle },
       cancelled: { color: "text-red-600 bg-red-50", icon: XCircle },
+      refunded: { color: "text-red-600 bg-red-50", icon: XCircle },
     }
     return config[status as keyof typeof config] || config.pending
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen">
+        <Header />
+        <main className="container py-8">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center py-16">
+              <p className="text-gray-600 dark:text-dark-text-secondary">Loading orders...</p>
+            </div>
+          </div>
+        </main>
+      </div>
+    )
   }
 
   return (
@@ -71,7 +123,7 @@ export default function OrdersPage() {
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <h3 className="font-semibold text-lg">{order.id}</h3>
+                          <h3 className="font-semibold text-lg">{order.orderNumber}</h3>
                           <span className={`px-3 py-1 rounded-full text-sm font-medium capitalize ${statusConfig.color} flex items-center gap-1`}>
                             <StatusIcon className="h-4 w-4" />
                             {order.status}
@@ -79,7 +131,7 @@ export default function OrdersPage() {
                         </div>
                         <p className="text-gray-600 dark:text-dark-text-secondary text-sm">
                           Placed on {new Date(order.createdAt).toLocaleDateString()} • 
-                          {order.items.length} item{order.items.length !== 1 ? 's' : ''} • 
+                          {order.orderItems.length} item{order.orderItems.length !== 1 ? 's' : ''} • 
                           ${order.total.toFixed(2)}
                         </p>
                         {order.estimatedDelivery && order.status !== 'delivered' && (
@@ -105,19 +157,19 @@ export default function OrdersPage() {
                     
                     {/* Order Items Preview */}
                     <div className="flex gap-3 overflow-x-auto pb-2">
-                      {order.items.slice(0, 4).map((item, index) => (
-                        <div key={index} className="flex items-center gap-2 bg-gray-50 dark:bg-dark-border px-3 py-2 rounded-lg min-w-0 flex-shrink-0">
+                      {order.orderItems.slice(0, 4).map((item, index) => (
+                        <div key={item.id} className="flex items-center gap-2 bg-gray-50 dark:bg-dark-border px-3 py-2 rounded-lg min-w-0 flex-shrink-0">
                           <Package className="h-4 w-4 text-gray-400 flex-shrink-0" />
                           <div className="min-w-0">
-                            <p className="text-sm font-medium truncate">{item.name}</p>
+                            <p className="text-sm font-medium truncate">{item.productName}</p>
                             <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
                           </div>
                         </div>
                       ))}
-                      {order.items.length > 4 && (
+                      {order.orderItems.length > 4 && (
                         <div className="flex items-center gap-2 bg-gray-50 dark:bg-dark-border px-3 py-2 rounded-lg">
                           <span className="text-sm text-gray-500">
-                            +{order.items.length - 4} more
+                            +{order.orderItems.length - 4} more
                           </span>
                         </div>
                       )}
