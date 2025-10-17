@@ -4,12 +4,10 @@ import { useState } from "react"
 import Image from "next/image"
 import { ZoomIn, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Product } from "../../../types/product"
 
 interface ProductGalleryProps {
-  product: {
-    images: string[]
-    name: string
-  }
+  product: Product
 }
 
 export function ProductGallery({ product }: ProductGalleryProps) {

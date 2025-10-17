@@ -6,23 +6,10 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useCartStore } from "@/lib/stores/cart-store"
 import { toast } from "sonner"
+import { Product } from "../../../types/product"
 
 interface ProductInfoProps {
-    product: {
-        id: string
-        name: string
-        price: number
-        originalPrice?: number
-        category: string
-        rating: number
-        reviewCount: number
-        isNew?: boolean
-        isBestSeller?: boolean
-        shortDescription: string
-        variants: { id: string; name: string; price: number; inStock: boolean }[]
-        inStock: boolean
-        sku: string
-    }
+  product: Product
 }
 
 export function ProductInfo({ product }: ProductInfoProps) {

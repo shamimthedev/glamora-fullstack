@@ -2,17 +2,10 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ProductReviews } from "./product-reviews"
+import { Product } from "../../../types/product"
 
 interface ProductTabsProps {
-  product: {
-    id: string
-    description: string
-    ingredients: string
-    howToUse: string
-    benefits: string[]
-    rating: number
-    reviewCount: number
-  }
+  product: Product
 }
 
 export function ProductTabs({ product }: ProductTabsProps) {

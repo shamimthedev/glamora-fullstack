@@ -8,10 +8,10 @@ import { Badge } from "@/components/ui/badge"
 import { useCartStore } from "@/lib/stores/cart-store"
 import { useWishlistStore } from "@/lib/stores/wishlist-store"
 import { toast } from "sonner"
-import { Product } from "@/lib/products-data" // Import the full Product type
+import { Product } from "../../../types/product"
 
 interface ProductCardProps {
-  product: Product // Use the full Product type
+  product: Product
 }
 
 export function ProductCard({ product }: ProductCardProps) {

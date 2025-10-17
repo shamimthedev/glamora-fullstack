@@ -1,3 +1,4 @@
+// src/app/products/page.tsx
 "use client"
 
 import { Header } from "@/components/layout/header"
@@ -5,27 +6,57 @@ import { ProductGrid } from "@/components/ecommerce/product-grid"
 import { SearchBox } from "@/components/ecommerce/search-box"
 import { FilterSidebar } from "@/components/ecommerce/filter-sidebar"
 import { Button } from "@/components/ui/button"
-import { Grid3X3, List } from "lucide-react"
+import { Filter, Grid3X3, List } from "lucide-react"
 import { useFilterStore } from "@/lib/stores/filter-store"
-import { products, filterProducts } from "@/lib/products-data"
-import { useState, useMemo } from "react"
+import { getProducts } from "@/lib/api/products"
+import { useState, useEffect } from "react"
+import { ApiProduct } from "@/lib/api/products"
 
 export default function ProductsPage() {
   const filters = useFilterStore()
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [products, setProducts] = useState<ApiProduct[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  // Filter products based on current filters
-  const filteredProducts = useMemo(() => {
-    return filterProducts(products, filters)
-  }, [filters])
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        setLoading(true)
+        const data = await getProducts({
+          category: filters.selectedCategories[0], // Take first category for now
+          search: filters.searchQuery,
+        })
+        setProducts(data)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load products')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadProducts()
+  }, [filters.selectedCategories, filters.searchQuery])
 
   const activeFilterCount = [
     filters.selectedCategories.length,
     filters.searchQuery ? 1 : 0,
-    filters.priceRange[0] > 0 || filters.priceRange[1] < 100 ? 1 : 0,
-    filters.inStockOnly ? 1 : 0,
-    filters.onSaleOnly ? 1 : 0,
   ].reduce((a, b) => a + b, 0)
+
+  if (error) {
+    return (
+      <div className="min-h-screen">
+        <Header />
+        <main className="container py-16 text-center">
+          <h1 className="text-2xl font-bold mb-4">Error loading products</h1>
+          <p className="text-gray-600 mb-8">{error}</p>
+          <Button onClick={() => window.location.reload()}>
+            Try Again
+          </Button>
+        </main>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen">
@@ -56,7 +87,7 @@ export default function ProductsPage() {
               {activeFilterCount > 0 && (
                 <div className="text-sm text-gray-500">
                   <span className="font-semibold text-gray-900 dark:text-dark-text-primary">
-                    {filteredProducts.length}
+                    {products.length}
                   </span> products found
                   {activeFilterCount > 0 && (
                     <span className="ml-2 text-primary-400">
@@ -102,16 +133,24 @@ export default function ProductsPage() {
             </div>
           </div>
 
+          {/* Loading State */}
+          {loading && (
+            <div className="text-center py-16">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-400 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Loading products...</p>
+            </div>
+          )}
+
           {/* Product Grid */}
-          <ProductGrid products={filteredProducts} viewMode={viewMode} />
+          {!loading && <ProductGrid products={products} viewMode={viewMode} /> }
 
           {/* No Results Message */}
-          {filteredProducts.length === 0 && (
+          {!loading && products.length === 0 && (
             <div className="text-center py-16">
               <div className="text-6xl mb-4">🔍</div>
               <h3 className="text-xl font-semibold mb-2">No products found</h3>
               <p className="text-gray-600 dark:text-dark-text-secondary mb-4">
-                Try adjusting your search or filters to find what you&apos;re looking for.
+                Try adjusting your search or filters to find what you're looking for.
               </p>
               <Button 
                 variant="outline" 
@@ -119,15 +158,6 @@ export default function ProductsPage() {
                 className="rounded-full"
               >
                 Clear all filters
-              </Button>
-            </div>
-          )}
-
-          {/* Load More */}
-          {filteredProducts.length > 0 && (
-            <div className="text-center mt-16">
-              <Button size="lg" variant="outline" className="rounded-full px-8">
-                Load More Products
               </Button>
             </div>
           )}

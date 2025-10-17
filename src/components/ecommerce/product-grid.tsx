@@ -1,9 +1,9 @@
+import { Product } from "../../../types/product"
 import { Button } from "../ui/button"
 import { ProductCard } from "./product-card"
-import { Product } from "@/lib/products-data"
 
 interface ProductGridProps {
-  products?: Product[]  // Make it optional with default
+  products: Product[]
   viewMode?: 'grid' | 'list'
 }
 

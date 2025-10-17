@@ -1,8 +1,8 @@
+import { Product } from "../../../types/product"
 import { ProductCard } from "./product-card"
-import { Product } from "@/lib/products-data"
 
 interface RelatedProductsProps {
-  products?: Product[] // Make it optional
+  products?: Product[]
 }
 
 export function RelatedProducts({ products = [] }: RelatedProductsProps) {

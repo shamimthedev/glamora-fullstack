@@ -1,10 +1,14 @@
+// src/app/page.tsx
 import { Header } from "@/components/layout/header"
 import { ProductGrid } from "@/components/ecommerce/product-grid"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Sparkle, CheckCircle, Leaf, Recycle } from "lucide-react"
-import { products } from "@/lib/products-data"
+import { getProducts } from "@/lib/api/products"
+import { Sparkle, CheckCircle, Leaf, Recycle, ArrowRight } from "lucide-react"
+import Link from "next/link"
 
-export default function Home() {
+export default async function Home() {
+  const featuredProducts = await getProducts({ limit: 6 })
+
   return (
     <div className="min-h-screen">
       <Header />
@@ -38,10 +42,12 @@ export default function Home() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button size="lg" className="bg-primary-400 hover:bg-primary-500 text-white px-8 py-3 text-lg rounded-full">
-                Shop Now
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+              <Link href="/products">
+                <Button size="lg" className="bg-primary-400 hover:bg-primary-500 text-white px-8 py-3 text-lg rounded-full">
+                  Shop Now
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
               <Button size="lg" variant="outline" className="border-2 px-8 py-3 text-lg rounded-full">
                 Our Story
               </Button>
@@ -77,12 +83,14 @@ export default function Home() {
               </p>
             </div>
             
-            <ProductGrid products={products.slice(0, 6)} />
+            <ProductGrid products={featuredProducts} />
             
             <div className="text-center mt-12">
-              <Button size="lg" variant="outline" className="rounded-full px-8">
-                View All Products
-              </Button>
+              <Link href="/products">
+                <Button size="lg" variant="outline" className="rounded-full px-8">
+                  View All Products
+                </Button>
+              </Link>
             </div>
           </div>
         </section>
